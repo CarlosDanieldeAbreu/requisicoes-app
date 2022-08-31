@@ -17,6 +17,15 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { DepartamentoModule } from './departamentos/departamento.module';
 import { EquipamentoModule } from './equipamentos/equipamento.module';
 
+import ptBr from '@angular/common/locales/pt';
+import { registerLocaleData } from '@angular/common';
+import { LOCALE_ID, DEFAULT_CURRENCY_CODE } from '@angular/core'
+import { NgxMaskModule, IConfig } from 'ngx-mask'
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+registerLocaleData(ptBr);
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,17 +35,24 @@ import { EquipamentoModule } from './equipamentos/equipamento.module';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     ReactiveFormsModule,
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,
+    ToastrModule.forRoot({positionClass: "toast-bottom-left"}),
 
     DepartamentoModule,
-    EquipamentoModule
+    EquipamentoModule,
+    NgxMaskModule.forRoot({dropSpecialCharacters: false})
   ],
-  providers: [AuthenticationService],
+  providers: [
+    AuthenticationService,
+    { provide: LOCALE_ID, useValue: "pt"},
+    { provide: DEFAULT_CURRENCY_CODE, useValue: "BRL"}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

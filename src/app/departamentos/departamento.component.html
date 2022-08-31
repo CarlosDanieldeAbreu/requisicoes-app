@@ -25,7 +25,7 @@
           <tbody class="text-center">
             <tr *ngFor="let departamento of (departamentos$ | async)">
               <td>{{ departamento.nome }}</td>
-              <td>{{ departamento.telefone }}</td>
+              <td>{{ departamento.telefone}}</td>
               <td class="d-grid d-md-block">
                 <button (click)="gravar(modal, departamento)" type="button" class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto">
                   <i class="pi pi-user-edit"></i>
@@ -58,7 +58,7 @@
       <div class="form-group mb-3">
         <label for="telefone" class="form-label">Telefone</label>
         <input formControlName="telefone" type="text" class="form-control"
-          placeholder="Digite o número de telefone do Departamento">
+        placeholder="(xx) xxxx-xxxx" mask="(00) 0000-0000||(00) 0 0000-0000">
       </div>
     </div>
     <div class="modal-footer">

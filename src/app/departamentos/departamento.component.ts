@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Departamento } from './models/departamento.model';
 import { DepartamentoService } from './services/departamento.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-departamento',
@@ -14,7 +15,11 @@ export class DepartamentoComponent implements OnInit {
   public departamentos$: Observable<Departamento[]>;
   public form: FormGroup;
 
-  constructor(private departamentoService: DepartamentoService, private modalServise: NgbModal, private fb: FormBuilder) { }
+  constructor(
+    private departamentoService: DepartamentoService,
+    private modalServise: NgbModal,
+    private fb: FormBuilder,
+    private toastrService: ToastrService) { }
 
   ngOnInit(): void {
     this.departamentos$ = this.departamentoService.selecionarTodos();
@@ -50,18 +55,46 @@ export class DepartamentoComponent implements OnInit {
     try {
       await this.modalServise.open(modal).result;
 
-      if(!departamento)
+      let tipo: string;
+      let tipo2: string;
+
+      if (!departamento){
         await this.departamentoService.inserir(this.form.value);
-      else
+        tipo = "inserido"
+        tipo2 = "Cadastro"
+      }
+      else{
         await this.departamentoService.editar(this.form.value);
+        tipo = "editado"
+        tipo2 = "Edição"
+      }
 
-      console.log(`O departamento foi salvo com sucesso`);
+      this.toastrService.success(`O departamento foi ${tipo} com sucesso`, `${tipo2} de departamentos`);
 
-    } catch (_error) {
+    } catch (error) {
+      let tipo: string;
+      let tipo2: string;
+      if (error != "fechar" && error != "0" && error != "1") {
+        if (!departamento) {
+          tipo = "inserir"
+          tipo2 = "Cadastro"
+        }
+        else {
+          tipo = "editar"
+          tipo2 = "Edição"
+        }
+
+        this.toastrService.error(`Houve um erro ao ${tipo} departamento. Tente novamente`, `${tipo2} de departamentos`);
+      }
     }
   }
 
-  public excluir(departamento: Departamento){
-    this.departamentoService.excluir(departamento);
+  public async excluir(departamento: Departamento){
+    try {
+      await this.departamentoService.excluir(departamento);
+      this.toastrService.success(`O departamento foi excluido com sucesso`, `Exclusão de departamentos`);
+    } catch (error) {
+      this.toastrService.error(`Houve um erro ao excluir departamento. Tente novamente`, `Exclusão de departamentos`);
+    }
   }
 }
