@@ -31,7 +31,8 @@
               <td>{{ equipamento.preco | currency }}</td>
               <td>{{ equipamento.data | date: 'dd/MM/yyyy' }}</td>
               <td class="d-grid d-md-block">
-                <button (click)="gravar(modal, equipamento)" type="button" class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto">
+                <button (click)="gravar(modal, equipamento)" type="button"
+                  class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto">
                   <i class="pi pi-user-edit"></i>
                 </button>
 
@@ -54,23 +55,45 @@
   </div>
   <form [formGroup]="form" (ngSubmit)="modal.close('gravar')">
     <div class="modal-body">
-      <div class="form-group mb-3">
+      <div class="form-group mb-3 position-relative">
         <label for="nome" class="form-label">Nome do Equipamento</label>
-        <input formControlName="nome" type="text" class="form-control"
+        <input formControlName="nome"
+          type="text"
+          [ngClass]="(nome?.touched && nome?.invalid) ? 'is-invalid' : ''"
+          class="form-control"
           placeholder="Digite o nome do Equipamento">
+          <div class="invalid-tooltip" *ngIf="nome?.touched && nome?.invalid">
+            <span *ngIf="nome?.errors?.['required']">O nome precisa ser preenchido.</span>
+            <span *ngIf="nome?.errors?.['minlength']">O nome precisa ter no minímo 3 letras.</span>
+          </div>
       </div>
-      <div class="form-group mb-3">
+      <div class="form-group mb-3 position-relative">
         <label for="preco" class="form-label">Preço de Aquisição</label>
-        <input formControlName="preco" type="text" class="form-control" currencyMask [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',', align: 'left' }" placeholder="R$ 0,00">
+        <input formControlName="preco"
+          type="text"
+          [ngClass]="(preco?.touched && preco?.invalid) ? 'is-invalid' : ''"
+          class="form-control"
+          currencyMask
+          [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',', align: 'left' }"
+          placeholder="R$ 0,00">
+          <div class="invalid-tooltip" *ngIf="preco?.touched && preco?.invalid">
+            <span *ngIf="preco?.errors?.['required']">O preço deve ser preenchido.</span>
+          </div>
       </div>
-      <div class="form-group mb-3">
+      <div class="form-group mb-3 position-relative">
         <label for="data" class="form-label">Data de Fabricação</label>
-        <input formControlName="data" type="date" class="form-control">
+        <input formControlName="data"
+          type="date"
+          [ngClass]="(data?.touched && data?.invalid) ? 'is-invalid' : ''"
+          class="form-control">
+          <div class="invalid-tooltip" *ngIf="data?.touched && data?.invalid">
+            <span *ngIf="data?.errors?.['required']">A data deve ser preenchida.</span>
+          </div>
       </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-primary col-md-3" (click)="modal.dismiss('fechar')">Cancelar</button>
-      <button type="submit" class="btn btn-primary col-md-3">Gravar</button>
+      <button type="submit" class="btn btn-primary col-md-3" [disabled]="this.form.invalid">Gravar</button>
     </div>
   </form>
 </ng-template>
