@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -28,10 +28,10 @@ export class FuncionarioComponent implements OnInit {
     this.funcionario$ = this.funcionarioService.selecionarTodos();
     this.form = this.fb.group({
       id: new FormControl(""),
-      nome: new FormControl(""),
-      email: new  FormControl(""),
-      funcao: new FormControl(""),
-      departamentoId: new FormControl(""),
+      nome: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      email: new  FormControl("", [Validators.required, Validators.email]),
+      funcao: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      departamentoId: new FormControl("", [Validators.required]),
       departamento: new FormControl("")
     });
 
@@ -47,16 +47,20 @@ export class FuncionarioComponent implements OnInit {
     return this.form.get("id");
   }
 
-  get nome() {
+  get nome(): AbstractControl | null {
     return this.form.get("nome");
   }
 
-  get email() {
+  get email(): AbstractControl | null {
     return this.form.get("email");
   }
 
-  get funcao() {
+  get funcao(): AbstractControl | null {
     return this.form.get("funcao");
+  }
+
+  get departamentoId(): AbstractControl | null {
+    return this.form.get("departamentoId");
   }
 
   public async gravar(modal: TemplateRef<any>, funcionario?: Funcionario) {
@@ -79,18 +83,21 @@ export class FuncionarioComponent implements OnInit {
       let tipo: string;
       let tipo2: string;
 
-      if (!funcionario) {
-        await this.funcionarioService.inserir(this.form.value);
-        tipo = "inserido"
-        tipo2 = "Cadastro"
-      }
-      else {
-        await this.funcionarioService.editar(this.form.value);
-        tipo = "editado"
-        tipo2 = "Edição"
-      }
+      if(this.form.dirty && this.form.valid){
+        if (!funcionario) {
+          await this.funcionarioService.inserir(this.form.value);
+          tipo = "inserido"
+          tipo2 = "Cadastro"
+        }
+        else {
+          await this.funcionarioService.editar(this.form.value);
+          tipo = "editado"
+          tipo2 = "Edição"
+        }
 
-      this.toastrService.success(`O funcionário foi ${tipo} com sucesso`, `${tipo2} de funcionários`);
+        this.toastrService.success(`O funcionário foi ${tipo} com sucesso`, `${tipo2} de Funcionários`);
+      }else
+        this.toastrService.error(`O formulário precisa ser preenchido!.`, `Cadastro de Funcionário`);
 
     } catch (error) {
       let tipo: string;
@@ -105,7 +112,7 @@ export class FuncionarioComponent implements OnInit {
           tipo2 = "Edição"
         }
 
-        this.toastrService.error(`Houve um erro ao ${tipo} funcionário. Tente novamente`, `${tipo2} de funcionários`);
+        this.toastrService.error(`Houve um erro ao ${tipo} funcionário. Tente novamente`, `${tipo2} de Funcionários`);
       }
     }
   }
@@ -113,9 +120,9 @@ export class FuncionarioComponent implements OnInit {
   public async excluir(funcionario: Funcionario) {
     try {
       await this.funcionarioService.excluir(funcionario);
-      this.toastrService.success(`O funcionário foi excluido com sucesso`, `Exclusão de funcionários`);
+      this.toastrService.success(`O funcionário foi excluido com sucesso`, `Exclusão de Funcionários`);
     } catch (error) {
-      this.toastrService.error(`Houve um erro ao excluir funcionário. Tente novamente`, `Exclusão de funcionários`);
+      this.toastrService.error(`Houve um erro ao excluir funcionário. Tente novamente`, `Exclusão de Funcionários`);
     }
   }
 }
