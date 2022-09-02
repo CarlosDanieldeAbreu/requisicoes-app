@@ -2,18 +2,22 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FuncionarioRoutingModule } from './funcionario-routing.module';
-import { FunciionarioComponent } from './funciionario.component';
 import { FuncionarioComponent } from './funcionario.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 @NgModule({
   declarations: [
-    FunciionarioComponent,
     FuncionarioComponent
   ],
   imports: [
     CommonModule,
-    FuncionarioRoutingModule
+    NgbModule,
+    ReactiveFormsModule,
+    FuncionarioRoutingModule,
+    NgSelectModule
   ]
 })
 export class FuncionarioModule { }

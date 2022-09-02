@@ -14,8 +14,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AuthenticationService } from './auth/services/authentication.service';
 import { PainelComponent } from './painel/painel.component';
 import { NavbarComponent } from './navbar/navbar.component';
-import { DepartamentoModule } from './departamentos/departamento.module';
-import { EquipamentoModule } from './equipamentos/equipamento.module';
 
 import ptBr from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
@@ -43,9 +41,6 @@ registerLocaleData(ptBr);
     AngularFireAuthModule,
     AngularFirestoreModule,
     ToastrModule.forRoot({positionClass: "toast-bottom-left"}),
-
-    DepartamentoModule,
-    EquipamentoModule,
     NgxMaskModule.forRoot({dropSpecialCharacters: false})
   ],
   providers: [
