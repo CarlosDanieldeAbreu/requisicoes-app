@@ -2,6 +2,7 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
@@ -17,17 +18,18 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthenticationService,
     private router: Router,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private toastrService: ToastrService
     ) { }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      email: new FormControl(""),
-      senha: new FormControl("")
+      email: new FormControl("", [Validators.required, Validators.email]),
+      senha: new FormControl("", [Validators.required])
     });
 
     this.formRecuperacao = this.formBuilder.group({
-      emailRecuperacao: new FormControl("")
+      emailRecuperacao: new FormControl("", [Validators.required, Validators.email])
     });
   }
 
@@ -50,12 +52,17 @@ export class LoginComponent implements OnInit {
     try{
       const resposta = await this.authService.login(email, senha);
 
-      if(resposta?.user) {
-        this.router.navigate(["/painel"]);
-      }
+      if(this.form.dirty && this.form.valid){
+        if(resposta?.user) {
+          this.router.navigate(["/painel"]);
+          this.toastrService.success(`O login foi executado com sucesso.`, 'Login');
+        }
+      }else
+        this.toastrService.success(`Email e Senha precisam ser preenchidos para realizar o login`, 'Login');
 
     }catch(error){
-      console.log(error);
+      if (error != "fechar" && error != "0" && error != "1")
+        this.toastrService.error(`Houve um erro ao logar, verifique senha e email se estão corretos. Tente novamente`, 'Login');
     }
   }
 

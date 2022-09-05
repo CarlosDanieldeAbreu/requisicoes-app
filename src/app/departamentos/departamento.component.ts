@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Departamento } from './models/departamento.model';
@@ -25,8 +25,8 @@ export class DepartamentoComponent implements OnInit {
     this.departamentos$ = this.departamentoService.selecionarTodos();
     this.form = this.fb.group({
       id: new FormControl(""),
-      nome: new FormControl(""),
-      telefone: new FormControl("")
+      nome: new FormControl("", [Validators.required, Validators.minLength(3)]),
+      telefone: new FormControl("", [Validators.required, Validators.minLength(8)])
     });
   }
 
@@ -38,11 +38,11 @@ export class DepartamentoComponent implements OnInit {
     return this.form.get("id");
   }
 
-  get nome(){
+  get nome(): AbstractControl | null{
     return this.form.get("nome");
   }
 
-  get telefone(){
+  get telefone(): AbstractControl | null{
     return this.form.get("telefone");
   }
 
@@ -57,31 +57,33 @@ export class DepartamentoComponent implements OnInit {
 
       let tipo: string;
       let tipo2: string;
+      if(this.form.dirty && this.form.valid){
+        if (!departamento){
+          await this.departamentoService.inserir(this.form.value);
+          tipo = "inserido";
+          tipo2 = "Cadastro";
+        }
+        else{
+          await this.departamentoService.editar(this.form.value);
+          tipo = "editado";
+          tipo2 = "Edição";
+        }
 
-      if (!departamento){
-        await this.departamentoService.inserir(this.form.value);
-        tipo = "inserido"
-        tipo2 = "Cadastro"
-      }
-      else{
-        await this.departamentoService.editar(this.form.value);
-        tipo = "editado"
-        tipo2 = "Edição"
-      }
-
-      this.toastrService.success(`O departamento foi ${tipo} com sucesso`, `${tipo2} de departamentos`);
+        this.toastrService.success(`O departamento foi ${tipo} com sucesso`, `${tipo2} de departamentos`);
+      }else
+        this.toastrService.error(`O formulário precisa ser preenchido!.`, `Cadastro de Departamento`);
 
     } catch (error) {
       let tipo: string;
       let tipo2: string;
       if (error != "fechar" && error != "0" && error != "1") {
         if (!departamento) {
-          tipo = "inserir"
-          tipo2 = "Cadastro"
+          tipo = "inserir";
+          tipo2 = "Cadastro";
         }
         else {
-          tipo = "editar"
-          tipo2 = "Edição"
+          tipo = "editar";
+          tipo2 = "Edição";
         }
 
         this.toastrService.error(`Houve um erro ao ${tipo} departamento. Tente novamente`, `${tipo2} de departamentos`);
