@@ -1,8 +1,10 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
+import { AuthenticationService } from '../auth/services/authentication.service';
 import { Departamento } from '../departamentos/models/departamento.model';
 import { DepartamentoService } from '../departamentos/services/departamento.service';
 import { Funcionario } from './models/funcionario.model';
@@ -18,6 +20,8 @@ export class FuncionarioComponent implements OnInit {
   public form: FormGroup;
 
   constructor(
+    private router: Router,
+    private authServise: AuthenticationService,
     private funcionarioService: FuncionarioService,
     private departamentoService: DepartamentoService,
     private modalServise: NgbModal,
@@ -35,7 +39,7 @@ export class FuncionarioComponent implements OnInit {
         departamentoId: new FormControl("", [Validators.required]),
         departamento: new FormControl("")
       }),
-      senha: new FormControl("")
+      senha: new FormControl("", [Validators.required, Validators.minLength(5)])
     });
 
     this.funcionario$ = this.funcionarioService.selecionarTodos();
@@ -92,9 +96,14 @@ export class FuncionarioComponent implements OnInit {
 
       if(this.form.dirty && this.form.valid){
         if (!funcionario) {
+          await this.authServise.cadastrar(this.email?.value, this.senha?.value);
+
           await this.funcionarioService.inserir(this.form.get("funcionario")?.value);
           tipo = "inserido"
           tipo2 = "Cadastro"
+
+          await this.authServise.logout();
+          await this.router.navigate(["/login"]);
         }
         else {
           await this.funcionarioService.editar(this.form.get("funcionario")?.value);

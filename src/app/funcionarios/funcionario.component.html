@@ -106,13 +106,17 @@
           </div>
         </div>
       </div>
-      <div class="form-group mb-3" *ngIf="!this.id?.value">
+      <div class="form-group mb-3 position-relative" *ngIf="!this.id?.value">
         <label for="senha" class="form-label">Senha</label>
           <input formControlName="senha"
             type="password"
             [ngClass]="(senha?.touched && senha?.invalid) ? 'is-invalid' : ''"
             class="form-control"
             placeholder="Digite a senha do funcionário">
+            <div class="invalid-tooltip" *ngIf="senha?.touched && nome?.invalid">
+              <span *ngIf="senha?.errors?.['required']">A senha precisa ser preenchida.</span>
+              <span *ngIf="senha?.errors?.['minlength']">A senha precisa ter no minímo 5 caracteres.</span>
+            </div>
       </div>
     </div>
     <div class="modal-footer">
