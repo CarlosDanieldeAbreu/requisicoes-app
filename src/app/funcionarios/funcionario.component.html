@@ -113,7 +113,7 @@
             [ngClass]="(senha?.touched && senha?.invalid) ? 'is-invalid' : ''"
             class="form-control"
             placeholder="Digite a senha do funcionário">
-            <div class="invalid-tooltip" *ngIf="senha?.touched && nome?.invalid">
+            <div class="invalid-tooltip" *ngIf="senha?.touched && senha?.invalid">
               <span *ngIf="senha?.errors?.['required']">A senha precisa ser preenchida.</span>
               <span *ngIf="senha?.errors?.['minlength']">A senha precisa ter no minímo 5 caracteres.</span>
             </div>

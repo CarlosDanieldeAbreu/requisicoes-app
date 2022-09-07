@@ -39,7 +39,7 @@ export class FuncionarioComponent implements OnInit {
         departamentoId: new FormControl("", [Validators.required]),
         departamento: new FormControl("")
       }),
-      senha: new FormControl("", [Validators.required, Validators.minLength(5)])
+      senha: new FormControl("", [Validators.minLength(5)])
     });
 
     this.funcionario$ = this.funcionarioService.selecionarTodos();
