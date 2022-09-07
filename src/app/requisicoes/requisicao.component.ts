@@ -7,6 +7,8 @@ import { Departamento } from '../departamentos/models/departamento.model';
 import { DepartamentoService } from '../departamentos/services/departamento.service';
 import { Equipamento } from '../equipamentos/models/equipamento.model';
 import { EquipamentoService } from '../equipamentos/services/equipamento.service';
+import { Funcionario } from '../funcionarios/models/funcionario.model';
+import { FuncionarioService } from '../funcionarios/services/funcionario.service';
 import { Requisicao } from './models/requisicao.model';
 import { RequisicaoService } from './services/requisicao.service';
 
@@ -15,8 +17,9 @@ import { RequisicaoService } from './services/requisicao.service';
   templateUrl: './requisicao.component.html',
 })
 export class RequisicaoComponent implements OnInit {
-  public departamentos$: Observable<Departamento[]>
+  public departamentos$: Observable<Departamento[]>;
   public equipamentos$: Observable<Equipamento[]>;
+  public funcionarios$: Observable<Funcionario[]>;
   public requisicoes$: Observable<Requisicao[]>;
   public form: FormGroup;
 
@@ -24,6 +27,7 @@ export class RequisicaoComponent implements OnInit {
     private requisicaoService: RequisicaoService,
     private departamentoService: DepartamentoService,
     private equipamentoService: EquipamentoService,
+    private funcionarioService: FuncionarioService,
     private modalServise: NgbModal,
     private fb: FormBuilder,
     private toastrService: ToastrService) { }
@@ -38,7 +42,6 @@ export class RequisicaoComponent implements OnInit {
       departamentoId: new FormControl("", [Validators.required]),
       departamento: new FormControl(""),
     });
-
     this.requisicoes$ = this.requisicaoService.selecionarTodos();
     this.departamentos$ = this.departamentoService.selecionarTodos();
     this.equipamentos$ = this.equipamentoService.selecionarTodos();
@@ -52,7 +55,7 @@ export class RequisicaoComponent implements OnInit {
     return this.form.get("id");
   }
 
-  get data(){
+  get data(): AbstractControl | null {
     return this.form.get("data");
   }
 
@@ -70,6 +73,12 @@ export class RequisicaoComponent implements OnInit {
 
   public async gravar(modal: TemplateRef<any>, requisicao?: Requisicao) {
     this.form.reset();
+
+    const locale = 'pt-br';
+
+    let data = new Date().toLocaleDateString(locale, { dateStyle: 'short' });
+    let hora = new Date().toLocaleTimeString(locale, { timeStyle: 'short' });
+    this.form.get("data")?.setValue(data + " " + hora);
 
     if (requisicao){
       const departamento = requisicao.departamento ? requisicao.departamento: null;
