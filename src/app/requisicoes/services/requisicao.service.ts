@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { map, Observable } from 'rxjs';
+import { AuthenticationService } from 'src/app/auth/services/authentication.service';
 import { Departamento } from 'src/app/departamentos/models/departamento.model';
 import { Equipamento } from 'src/app/equipamentos/models/equipamento.model';
+import { Funcionario } from 'src/app/funcionarios/models/funcionario.model';
 import { Requisicao } from '../models/requisicao.model';
 
 @Injectable({
@@ -11,7 +13,7 @@ import { Requisicao } from '../models/requisicao.model';
 export class RequisicaoService {
   private registros: AngularFirestoreCollection<Requisicao>;
 
-  constructor(private firestore: AngularFirestore) {
+  constructor(private firestore: AngularFirestore, private authService: AuthenticationService) {
     this.registros = this.firestore.collection<Requisicao>("requisicoes");
   }
 
@@ -51,6 +53,27 @@ export class RequisicaoService {
               .valueChanges()
               .subscribe(x => requisicao.equipamento = x);
           });
+
+          requisicoes.forEach(requisicao => {
+            this.firestore
+              .collection<Funcionario>("funcionarios")
+              .doc(requisicao.funcionarioId)
+              .valueChanges()
+              .subscribe(x => requisicao.funcionario = x);
+          });
+          
+          let valorSalvo;
+
+                    this.authService.usuarioLogado.subscribe(x => {
+                        valorSalvo = x?.uid;
+                        return valorSalvo
+                    });
+
+                    let email;
+
+                    this.authService.usuarioLogado.subscribe((x) => {
+                        email = x?.email;
+                    });
 
           return requisicoes;
         })
