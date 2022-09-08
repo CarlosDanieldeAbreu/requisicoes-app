@@ -2,7 +2,8 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
+import { map, Observable, Subscriber } from 'rxjs';
+import { AuthenticationService } from '../auth/services/authentication.service';
 import { Departamento } from '../departamentos/models/departamento.model';
 import { DepartamentoService } from '../departamentos/services/departamento.service';
 import { Equipamento } from '../equipamentos/models/equipamento.model';
@@ -20,10 +21,12 @@ export class RequisicaoComponent implements OnInit {
   public departamentos$: Observable<Departamento[]>;
   public equipamentos$: Observable<Equipamento[]>;
   public funcionarios$: Observable<Funcionario[]>;
+  public funcionarioLogado: Funcionario;
   public requisicoes$: Observable<Requisicao[]>;
   public form: FormGroup;
 
   constructor(
+    private authService: AuthenticationService,
     private requisicaoService: RequisicaoService,
     private departamentoService: DepartamentoService,
     private equipamentoService: EquipamentoService,
@@ -41,10 +44,14 @@ export class RequisicaoComponent implements OnInit {
       equipamento: new FormControl(""),
       departamentoId: new FormControl("", [Validators.required]),
       departamento: new FormControl(""),
+      funcionarioId: new FormControl(""),
+      funcionario: new FormControl(""),
     });
     this.requisicoes$ = this.requisicaoService.selecionarTodos();
     this.departamentos$ = this.departamentoService.selecionarTodos();
     this.equipamentos$ = this.equipamentoService.selecionarTodos();
+    this.funcionarios$ = this.funcionarioService.selecionarTodos();
+    this.obterFuncionarioLogado();
   }
 
   get tituloModal(): string {
@@ -71,21 +78,38 @@ export class RequisicaoComponent implements OnInit {
     return this.form.get("departamentoId");
   }
 
-  public async gravar(modal: TemplateRef<any>, requisicao?: Requisicao) {
+  get funcionarioId(): AbstractControl | null {
+    return this.form.get("funcionarioId");
+  }
+
+  public obterFuncionarioLogado() {
+    this.authService.usuarioLogado.subscribe(dados => {
+        let email = dados?.email;
+        this.funcionarioService.selecionarFuncionarioLogado(email)
+            .subscribe(funcionario => {
+                this.funcionarioLogado = funcionario;
+
+                this.requisicoes$ = this.requisicaoService.selecionarTodos()
+                .pipe(
+                    map(requisicao => {
+                        return requisicao.filter(x => x.funcionario?.email === this.funcionarioLogado.email);
+                    })
+                )
+
+            })
+    })
+  }
+
+  public async gravar(modal: TemplateRef<any>, requisicao?: Requisicao, funcionario?: Funcionario) {
     this.form.reset();
-
-    const locale = 'pt-br';
-
-    let data = new Date().toLocaleDateString(locale, { dateStyle: 'short' });
-    let hora = new Date().toLocaleTimeString(locale, { timeStyle: 'short' });
-    this.form.get("data")?.setValue(data + " " + hora);
 
     if (requisicao){
       const departamento = requisicao.departamento ? requisicao.departamento: null;
       const equipamento = requisicao.equipamento ? requisicao.equipamento: null;
-
+      const funcionario = requisicao.funcionario ? requisicao.funcionario : null;
       const requisicaoCompleta = {
         ...requisicao,
+        funcionario,
         departamento,
         equipamento
       }
@@ -110,6 +134,12 @@ export class RequisicaoComponent implements OnInit {
           tipo = "editada";
           tipo2 = "Edição";
         }
+        
+        const locale = 'pt-br';
+        let data = new Date().toLocaleDateString(locale, { dateStyle: 'short' });
+        let hora = new Date().toLocaleTimeString(locale, { timeStyle: 'short' });
+        this.data?.setValue(data + " " + hora);
+        this.funcionarioId?.setValue(this.funcionarioLogado.id);
 
         this.toastrService.success(`A requisição foi ${tipo} com sucesso`, `${tipo2} de requisições`);
       }else
