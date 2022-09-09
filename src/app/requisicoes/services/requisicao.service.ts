@@ -37,45 +37,47 @@ export class RequisicaoService {
   public selecionarTodos(): Observable<Requisicao[]>{
     return this.registros.valueChanges()
       .pipe(
-        map((requisicoes: Requisicao[]) => {
+        map((requisicoes => {
           requisicoes.forEach(requisicao => {
             this.firestore
               .collection<Departamento>("departamentos")
               .doc(requisicao.departamentoId)
               .valueChanges()
               .subscribe(x => requisicao.departamento = x)
-          });
 
-          requisicoes.forEach(requisicao => {
-            this.firestore
-              .collection<Equipamento>("equipamentos")
-              .doc(requisicao.equipamentoId)
-              .valueChanges()
-              .subscribe(x => requisicao.equipamento = x);
-          });
-
-          requisicoes.forEach(requisicao => {
             this.firestore
               .collection<Funcionario>("funcionarios")
               .doc(requisicao.funcionarioId)
               .valueChanges()
               .subscribe(x => requisicao.funcionario = x);
+
+            if(requisicao.equipamentoId){
+              this.firestore
+              .collection<Equipamento>("equipamentos")
+              .doc(requisicao.equipamentoId)
+              .valueChanges()
+              .subscribe(x => requisicao.equipamento = x);
+            }
           });
-          
-          let valorSalvo;
-
-                    this.authService.usuarioLogado.subscribe(x => {
-                        valorSalvo = x?.uid;
-                        return valorSalvo
-                    });
-
-                    let email;
-
-                    this.authService.usuarioLogado.subscribe((x) => {
-                        email = x?.email;
-                    });
-
           return requisicoes;
+        }))
+      )
+  }
+
+  public selecionarRequisicoesFuncionarioAtual(id: string){
+    return this.selecionarTodos()
+      .pipe(
+        map(requisicoes => {
+          return requisicoes.filter(requisicao => requisicao.funcionarioId === id);
+        })
+      )
+  }
+
+  public selecionarRequisicoesDepartamentoAtual(id: string){
+    return this.selecionarTodos()
+      .pipe(
+        map(requisicoes => {
+          return requisicoes.filter(requisicao => requisicao.departamentoId === id);
         })
       )
   }
