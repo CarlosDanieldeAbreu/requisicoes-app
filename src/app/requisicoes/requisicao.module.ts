@@ -10,6 +10,8 @@ import { RequisicoesFuncionariosComponent } from './requisicoes-funcionarios/req
 import { RequisicoesDepartamentoComponent } from './requisicoes-departamento/requisicoes-departamento.component';
 import { DetalhesComponent } from './detalhes/detalhes.component';
 import { RequisicaoDetalhesComponent } from './detalhes/requisicao-detalhes/requisicao-detalhes.component';
+import { RequisicoesDepartamentoPipe } from './pipes/requisicoes-departamento.pipe';
+import { RequisicoesFuncionarioPipe } from './pipes/requisicoes-funcionario.pipe';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { RequisicaoDetalhesComponent } from './detalhes/requisicao-detalhes/requ
     RequisicoesFuncionariosComponent,
     RequisicoesDepartamentoComponent,
     DetalhesComponent,
-    RequisicaoDetalhesComponent
+    RequisicaoDetalhesComponent,
+    RequisicoesDepartamentoPipe,
+    RequisicoesFuncionarioPipe
   ],
   imports: [
     CommonModule,

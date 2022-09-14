@@ -26,7 +26,7 @@
             </tr>
           </thead>
           <tbody class="text-center">
-            <tr *ngFor="let requisicao of (requisicoes$ | async)">
+            <tr *ngFor="let requisicao of (requisicoes$ | async | requisicoesDepartamento: funcionarioLogado.departamentoId)">
               <td>{{ requisicao.dataAbertura.toDate() | date: "dd/MM/yyyy HH:mm"}}</td>
               <td>{{ requisicao.departamento?.nome}}</td>
               <td>{{ requisicao.descricao }}</td>
