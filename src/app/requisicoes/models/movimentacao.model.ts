@@ -1,9 +1,8 @@
-import { Requisicao } from "./requisicao.model"
+import { Funcionario } from "src/app/funcionarios/models/funcionario.model";
 
 export class Movimentacao{
-  requisicaoId: string;
-  requisicao?: Requisicao;
-  dataAtualizacao: Date | any;
-  nMovimentacao: number;
-  status: string
+  status: string;
+  data: Date | any;
+  descricao: string;
+  funcionario: Funcionario;
 }

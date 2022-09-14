@@ -50,6 +50,10 @@ export class RequisicoesFuncionariosComponent implements OnInit, OnDestroy {
       departamento: new FormControl(""),
       funcionarioId: new FormControl(""),
       funcionario: new FormControl(""),
+
+      status: new FormControl(""),
+      ultimaAtualizacao: new FormControl(""),
+      movimentacoes: new FormControl(""),
     });
 
     this.requisicoes$ = this.requisicaoService.selecionarTodos();
@@ -100,6 +104,16 @@ export class RequisicoesFuncionariosComponent implements OnInit, OnDestroy {
   get funcionarioId(): AbstractControl | null {
     return this.form.get("funcionarioId");
   }
+
+  get ultimaAtualizacao(): AbstractControl | null{
+    return this.form.get("ultimaAtualizacao")
+  }
+
+
+  get status(): AbstractControl | null {
+    return this.form.get("status")
+  }
+
 
   public async gravar(modal: TemplateRef<any>, requisicao?: Requisicao) {
     this.form.reset();
@@ -170,11 +184,9 @@ export class RequisicoesFuncionariosComponent implements OnInit, OnDestroy {
   }
 
   private configurarValoresPadrao(): void{
-    const locale = 'pt-br';
-    let data = new Date().toLocaleDateString(locale, { dateStyle: 'short' });
-    let hora = new Date().toLocaleTimeString(locale, { timeStyle: 'short' });
-
-    this.dataAbertura?.setValue(data + " " + hora);
+    this.status?.setValue("Aberta");
+    this.dataAbertura?.setValue(new Date());
+    this.ultimaAtualizacao?.setValue(new Date());
     this.equipamentoId?.setValue(null);
     this.funcionarioId?.setValue(this.funcionarioLogadoId);
   }
