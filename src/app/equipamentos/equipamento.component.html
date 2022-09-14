@@ -88,6 +88,7 @@
           class="form-control">
           <div class="invalid-tooltip" *ngIf="data?.touched && data?.invalid">
             <span *ngIf="data?.errors?.['required']">A data deve ser preenchida.</span>
+            <span *ngIf="data?.errors?.['dataFutura']">A data não deve exceder hoje.</span>
           </div>
       </div>
     </div>
